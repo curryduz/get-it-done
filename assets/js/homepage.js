@@ -6,13 +6,16 @@ var getUserRepos = function(user) {
   fetch(apiUrl).then(function(response) {
     console.log(response);
     response.json().then(function(data) {
-      console.log(data);
+    displayRepos(data, user);
     });
   });
 };
 
 var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
+var repoContainerEl = document.querySelector("#repos-container");
+var repoSearchTerm = document.querySelector("#repo-search-term");
+
 
 var formSubmitHandler = function(event) {
   event.preventDefault();
