@@ -3,9 +3,24 @@ var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
 
+var formSubmitHandler = function (event) {
+  //prevent page from refreshing
+  event.preventDefault();
+  console.log(event);
 
+  // get value from input element
+  var username = nameInputEl.value.trim();
 
+  if (username) {
+    getUserRepos(username);
 
+    // clear old content
+    repoContainerEl.textContent = '';
+    nameInputEl.value = '';
+  } else {
+    alert('Please enter a GitHub username');
+  }
+};
 
 var getUserRepos = function (user) {
   // format the github api url
@@ -13,41 +28,30 @@ var getUserRepos = function (user) {
 
   // make a request to the url
   fetch(apiUrl).then(function (response) {
+    //request was sucessful
     if (response.ok) {
-      response.json().then(function (data) {
+      console.log(response)
+      response.json().then(function(data) {
+        console.log(data);
         displayRepos(data, user);
       });
     } else {
       alert("Error: " + response.statusText);
     }
-  });
-};
-
-
-var formSubmitHandler = function (event) {
-  event.preventDefault();
-  console.log(event);
-};
-
-userFormEl.addEventListener("submit", formSubmitHandler);
-
-// get value from input element
-var username = nameInputEl.value.trim();
-
-if (username) {
-  getUserRepos(username);
-  nameInputEl.value = "";
-  response.json().then(function (data) {
-    displayRepos(data, user);
+  })
+  .catch(function(error) {
+    alert('Unable to connect to Github');
   });
 
-} else {
-  alert("Please enter a GitHub username");
-}
+};
 
 var displayRepos = function (repos, searchTerm) {
-  // clear old content
-  repoContainerEl.textContent = "";
+  //check if api returned any repos
+  if(repos.length === 0){
+  repoSearchTerm.textContent = 'No repsitories found.';
+  return;
+  }
+
   repoSearchTerm.textContent = searchTerm;
 
   // loop over repos
@@ -80,9 +84,12 @@ var displayRepos = function (repos, searchTerm) {
 
     // append to container
     repoEl.appendChild(statusEl);
+
     // append container to the dom
     repoContainerEl.appendChild(repoEl);
   }
 
 };
-getUserRepos();
+
+//add event listeners to forms
+  userFormEl.addEventListener("submit", formSubmitHandler);
